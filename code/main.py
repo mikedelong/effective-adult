@@ -51,9 +51,9 @@ if __name__ == '__main__':
 
     logger.debug(df.dtypes)
 
-    numerical_variables = ['fnlwgt', 'capgain', 'caploss', 'hrsweekly']
-    categorical_variables = ['native_country', 'target', 'sex', 'race', 'relationship', 'education', 'occupation',
-                             'workclass', 'marital_status']
+    categorical_variables = sorted(
+        ['native_country', 'target', 'sex', 'race', 'relationship', 'education', 'occupation', 'workclass',
+         'marital_status'])
     for label in categorical_variables:
         label_encoder = LabelEncoder()
         df[label] = label_encoder.fit_transform(df[label])
@@ -70,6 +70,7 @@ if __name__ == '__main__':
 
     # now predict using just the numerical variables
     logger.debug('scores predicting using just numerical variables:')
+    numerical_variables = sorted(['fnlwgt', 'capgain', 'caploss', 'hrsweekly'])
     for target_column in categorical_variables:
         X = df[numerical_variables]
         y = df[target_column].values
