@@ -3,6 +3,9 @@ import os
 import time
 
 import pandas as pd
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import LabelEncoder
+from sklearn.tree import DecisionTreeClassifier
 
 if __name__ == '__main__':
     start_time = time.time()
@@ -45,6 +48,24 @@ if __name__ == '__main__':
         logger.debug('column %s has %d missing values' % (column, count))
         df = df[df[column] != '?']
         logger.debug('after removing ?s from column %s we have %d rows' % (column, df.shape[0]))
+
+    logger.debug(df.dtypes)
+
+    numerical_variables = ['fnlwgt', 'capgain', 'caploss', 'hrsweekly']
+    categorical_variables = ['native_country', 'target', 'sex', 'race', 'relationship', 'education', 'occupation',
+                             'workclass', 'marital_status']
+    for label in categorical_variables:
+        label_encoder = LabelEncoder()
+        df[label] = label_encoder.fit_transform(df[label])
+
+    for target_column in categorical_variables:
+        X = df.drop([target_column], axis=1).values
+        y = df[target_column].values
+        X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2)
+        clf_dt = DecisionTreeClassifier(max_depth=10)
+
+        clf_dt.fit(X_train, y_train)
+        logger.debug('target: %s score: %.4f' % (target_column, clf_dt.score(X_test, y_test)))
 
     logger.debug('done')
     finish_time = time.time()
