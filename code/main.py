@@ -41,19 +41,24 @@ if __name__ == '__main__':
 
     logger.debug(df.head(20))
 
-    # remove rows with missing values to get a good generating basis
-    for column in ['workclass', 'occupation', 'native_country']:
+    columns_to_clean_up = list()
+    categorical_variables = sorted(
+        ['native_country', 'target', 'sex', 'race', 'relationship', 'education', 'occupation', 'workclass',
+         'marital_status'])
+    for column in categorical_variables:
         df[column] = df[column].str.strip()
         count = df[column].isin(['?']).sum()
         logger.debug('column %s has %d missing values' % (column, count))
+        if count > 0:
+            columns_to_clean_up.append(column)
+
+    # remove rows with missing values to get a good generating basis
+    for column in columns_to_clean_up:
         df = df[df[column] != '?']
         logger.debug('after removing ?s from column %s we have %d rows' % (column, df.shape[0]))
 
     logger.debug(df.dtypes)
 
-    categorical_variables = sorted(
-        ['native_country', 'target', 'sex', 'race', 'relationship', 'education', 'occupation', 'workclass',
-         'marital_status'])
     for label in categorical_variables:
         label_encoder = LabelEncoder()
         df[label] = label_encoder.fit_transform(df[label])
