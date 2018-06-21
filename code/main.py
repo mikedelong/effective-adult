@@ -1,6 +1,7 @@
 import logging
 import os
 import time
+from typing import List
 
 import pandas as pd
 from sklearn.model_selection import train_test_split
@@ -41,7 +42,7 @@ if __name__ == '__main__':
 
     logger.debug(df.head(20))
 
-    columns_to_clean_up = list()
+    columns_to_clean_up = list()  # type: List[str]
     categorical_variables = sorted(
         ['native_country', 'target', 'sex', 'race', 'relationship', 'education', 'occupation', 'workclass',
          'marital_status'])
@@ -69,21 +70,22 @@ if __name__ == '__main__':
         y = df[target_column].values
         X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2)
         clf_dt = DecisionTreeClassifier(max_depth=10)
-
         clf_dt.fit(X_train, y_train)
         logger.debug('target: %s score: %.4f' % (target_column, clf_dt.score(X_test, y_test)))
 
     # now predict using just the numerical variables
     logger.debug('scores predicting using just numerical variables:')
     numerical_variables = sorted(['fnlwgt', 'capgain', 'caploss', 'hrsweekly'])
+    score_results = dict()
     for target_column in categorical_variables:
         X = df[numerical_variables]
         y = df[target_column].values
         X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2)
         clf_dt = DecisionTreeClassifier(max_depth=10)
-
         clf_dt.fit(X_train, y_train)
-        logger.debug('target: %s score: %.4f' % (target_column, clf_dt.score(X_test, y_test)))
+        score = clf_dt.score(X_test, y_test)
+        logger.debug('target: %s score: %.4f' % (target_column, score))
+        score_results[target_column] = score
 
     logger.debug('done')
     finish_time = time.time()
