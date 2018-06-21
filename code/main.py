@@ -36,7 +36,15 @@ if __name__ == '__main__':
     columns = df.columns.values
     logger.debug('the dataset has columns %s' % columns)
 
-    logger.debug(df.head())
+    logger.debug(df.head(20))
+
+    # remove rows with missing values to get a good generating basis
+    for column in ['workclass', 'occupation', 'native_country']:
+        df[column] = df[column].str.strip()
+        count = df[column].isin(['?']).sum()
+        logger.debug('column %s has %d missing values' % (column, count))
+        df = df[df[column] != '?']
+        logger.debug('after removing ?s from column %s we have %d rows' % (column, df.shape[0]))
 
     logger.debug('done')
     finish_time = time.time()
