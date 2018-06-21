@@ -58,8 +58,20 @@ if __name__ == '__main__':
         label_encoder = LabelEncoder()
         df[label] = label_encoder.fit_transform(df[label])
 
+    logger.debug('scores predicting using all other variables:')
     for target_column in categorical_variables:
         X = df.drop([target_column], axis=1).values
+        y = df[target_column].values
+        X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2)
+        clf_dt = DecisionTreeClassifier(max_depth=10)
+
+        clf_dt.fit(X_train, y_train)
+        logger.debug('target: %s score: %.4f' % (target_column, clf_dt.score(X_test, y_test)))
+
+    # now predict using just the numerical variables
+    logger.debug('scores predicting using just numerical variables:')
+    for target_column in categorical_variables:
+        X = df[numerical_variables]
         y = df[target_column].values
         X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2)
         clf_dt = DecisionTreeClassifier(max_depth=10)
