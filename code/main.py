@@ -29,11 +29,14 @@ if __name__ == '__main__':
         quit()
 
     train_file = input_folder + 'adult.data'
-    df = pd.read_csv(train_file)
+    input_columns = ['age', 'workclass', 'fnlwgt', 'education', 'education_years', 'marital_status', 'occupation',
+                     'relationship', 'race', 'sex', 'capgain', 'caploss', 'hrsweekly', 'native_country', 'target']
+    df = pd.read_csv(train_file, names=input_columns)
     logger.debug('the original training dataset has shape %d x %d' % df.shape)
     columns = df.columns.values
     logger.debug('the dataset has columns %s' % columns)
 
+    logger.debug(df.head())
 
     logger.debug('done')
     finish_time = time.time()
