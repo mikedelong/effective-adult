@@ -1,4 +1,5 @@
 import logging
+import operator
 import os
 import time
 from typing import List
@@ -86,6 +87,10 @@ if __name__ == '__main__':
         score = clf_dt.score(X_test, y_test)
         logger.debug('target: %s score: %.4f' % (target_column, score))
         score_results[target_column] = score
+
+    # get an ordering out of the scores dict
+    order = sorted(score_results.items(), key=operator.itemgetter(1), reverse=True)
+    logger.debug(order)
 
     logger.debug('done')
     finish_time = time.time()
