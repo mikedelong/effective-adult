@@ -103,7 +103,7 @@ if __name__ == '__main__':
             clf_dt = DecisionTreeClassifier(max_depth=10)
             clf_dt.fit(X_train, y_train)
             score = clf_dt.score(X_test, y_test)
-            logger.debug('target: %s score: %.4f' % (feature, score))
+            logger.debug('target: %s score: %.4f variables: %s' % (feature, score, current_variables))
 
     logger.debug('done')
     finish_time = time.time()
