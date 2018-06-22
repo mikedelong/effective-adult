@@ -91,6 +91,19 @@ if __name__ == '__main__':
     # get an ordering out of the scores dict
     order = sorted(score_results.items(), key=operator.itemgetter(1), reverse=True)
     logger.debug(order)
+    # build up the model by adding the features incrementally
+    current_variables = numerical_variables.copy()
+    for item in order:
+        feature = item[0]
+        if feature != 'target':
+            current_variables.append(feature)
+            X = df[current_variables]
+            y = df['target'].values
+            X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2)
+            clf_dt = DecisionTreeClassifier(max_depth=10)
+            clf_dt.fit(X_train, y_train)
+            score = clf_dt.score(X_test, y_test)
+            logger.debug('target: %s score: %.4f' % (feature, score))
 
     logger.debug('done')
     finish_time = time.time()
