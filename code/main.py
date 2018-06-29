@@ -42,8 +42,6 @@ if __name__ == '__main__':
     columns = df.columns.values
     logger.debug('the dataset has columns %s' % columns)
 
-    logger.debug(df.head(20))
-
     columns_to_clean_up = list()  # type: List[str]
     categorical_variables = sorted(
         ['native_country', 'target', 'sex', 'race', 'relationship', 'education', 'occupation', 'workclass',
@@ -66,14 +64,21 @@ if __name__ == '__main__':
         label_encoder = LabelEncoder()
         df[label] = label_encoder.fit_transform(df[label])
 
+    random_state = 1
+    test_size = 0.2
+    max_depth = 10
+
     logger.debug('scores predicting using all other variables:')
     for target_column in categorical_variables:
         X = df.drop([target_column], axis=1).values
         y = df[target_column].values
-        X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2)
-        clf_dt = DecisionTreeClassifier(max_depth=10)
+        X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=test_size, random_state=random_state)
+        clf_dt = DecisionTreeClassifier(max_depth=max_depth, random_state=random_state)
         clf_dt.fit(X_train, y_train)
         logger.debug('target: %s score: %.4f' % (target_column, clf_dt.score(X_test, y_test)))
+        features = [item for item in df.columns.values if item != target_column]
+        for index, item in enumerate(clf_dt.feature_importances_):
+            logger.debug('\tfeature %s has importance %.4f' % (features[index], item))
 
     # now predict using just the numerical variables
     logger.debug('scores predicting using just numerical variables:')
@@ -82,11 +87,13 @@ if __name__ == '__main__':
     for target_column in categorical_variables:
         X = df[numerical_variables]
         y = df[target_column].values
-        X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2)
-        clf_dt = DecisionTreeClassifier(max_depth=10)
+        X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=test_size, random_state=random_state)
+        clf_dt = DecisionTreeClassifier(max_depth=max_depth, random_state=random_state)
         clf_dt.fit(X_train, y_train)
         score = clf_dt.score(X_test, y_test)
         logger.debug('target: %s score: %.4f' % (target_column, score))
+        for index, item in enumerate(clf_dt.feature_importances_):
+            logger.debug('\tfeature %s has importance %.4f' % (numerical_variables[index], item))
         score_results[target_column] = score
 
     # get an ordering out of the scores dict
@@ -94,14 +101,16 @@ if __name__ == '__main__':
     logger.debug(order)
     # build up the model by adding the features incrementally
     current_variables = numerical_variables.copy()
+    # hack!
+    order = list()
     for item in order:
         feature = item[0]
         if feature != 'target':
             current_variables.append(feature)
             X = df[current_variables]
             y = df['target'].values
-            X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2)
-            clf_dt = DecisionTreeClassifier(max_depth=10)
+            X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=test_size, random_state=random_state)
+            clf_dt = DecisionTreeClassifier(max_depth=max_depth, random_state=random_state)
             clf_dt.fit(X_train, y_train)
             score = clf_dt.score(X_test, y_test)
             logger.debug('target: %s score: %.4f variables: %s' % (feature, score, current_variables))
