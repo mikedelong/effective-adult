@@ -101,8 +101,6 @@ if __name__ == '__main__':
     logger.debug(order)
     # build up the model by adding the features incrementally
     current_variables = numerical_variables.copy()
-    # hack!
-    order = list()
     for item in order:
         feature = item[0]
         if feature != 'target':
@@ -114,6 +112,8 @@ if __name__ == '__main__':
             clf_dt.fit(X_train, y_train)
             score = clf_dt.score(X_test, y_test)
             logger.debug('target: %s score: %.4f variables: %s' % (feature, score, current_variables))
+            for index, importance in enumerate(clf_dt.feature_importances_):
+                logger.debug('\tfeature %s has importance %.4f' % (current_variables[index], importance))
 
     logger.debug('done')
     finish_time = time.time()
