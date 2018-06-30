@@ -111,7 +111,7 @@ if __name__ == '__main__':
             clf_dt = DecisionTreeClassifier(max_depth=max_depth, random_state=random_state)
             clf_dt.fit(X_train, y_train)
             score = clf_dt.score(X_test, y_test)
-            logger.debug('target: %s score: %.4f variables: %s' % (feature, score, current_variables))
+            logger.debug('target: %s score: %.4f variables: %s' % ('target', score, current_variables))
             for index, importance in enumerate(clf_dt.feature_importances_):
                 logger.debug('\tfeature %s has importance %.4f' % (current_variables[index], importance))
 
